@@ -1,4 +1,4 @@
-# taller-consulta-api
+# rick-and-morty-personajes
 
 ## Project setup
 ```

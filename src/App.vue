@@ -150,7 +150,7 @@ export default {
   display: block !important;
 }
 .py-24 {
-  padding: 4rem 0;
+  padding: 4rem 0 !important;
 }
 
 .container, .modal-card {

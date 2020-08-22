@@ -1,4 +1,4 @@
-# rick-and-morty-personajes
+# api-rick-and-morty-vuex
 
 ## Project setup
 ```

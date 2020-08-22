@@ -18,7 +18,12 @@
             />
           </div>
           <div class="control">
-            <button class="button is-fullwidth is-success mx-auto" @click="searchData()">Consultar</button>
+            <button
+              class="button is-fullwidth is-success mx-auto"
+              @click="searchData()"
+            >
+              Consultar
+            </button>
           </div>
         </div>
       </div>
@@ -27,16 +32,23 @@
       <div class="columns is-desktop is-mobile is-tablet is-multiline">
         <characters
           @showModal="showModal"
-          v-for="character of characters "
+          v-for="character of characters"
           :character="character"
           :key="character.id"
         />
       </div>
       <nav class="pagination" role="navigation" aria-label="pagination">
-        <a class="pagination-previous" @click="changePage(page - 1)">Anterior</a>
+        <a class="pagination-previous" @click="changePage(page - 1)"
+          >Anterior</a
+        >
         <ul class="pagination-list">
           <li v-if="page == pages">
-            <a class="pagination-link" @click="changePage(1)" aria-label="Goto firt page">1</a>
+            <a
+              class="pagination-link"
+              @click="changePage(1)"
+              aria-label="Goto firt page"
+              >1</a
+            >
           </li>
           <li v-if="page !== pages">
             <a class="pagination-link is-current">{{ page }}</a>
@@ -46,30 +58,42 @@
           </li>
           <li>
             <a
-              :class="{'pagination-link is-current': page == pages, 'pagination-link': page !== pages}"
+              :class="{
+                'pagination-link is-current': page == pages,
+                'pagination-link': page !== pages
+              }"
               @click="changePage(pages)"
               aria-label="Goto last page"
-            >{{ pages }}</a>
+              >{{ pages }}</a
+            >
           </li>
         </ul>
         <a class="pagination-next" @click="changePage(page + 1)">Siguiente</a>
       </nav>
     </div>
     <div class="modal" v-if="modal" :class="{ 'is-active': modal }">
-      <div class="modal-background" @click="modal  = false"></div>
+      <div class="modal-background" @click="closeModal()"></div>
       <div class="modal-card">
         <header class="modal-card-head">
-          <p class="modal-card-title">{{currentCharacter.name}}</p>
-          <button @click="modal  = false" class="delete" aria-label="close"></button>
+          <p class="modal-card-title">{{ currentCharacter.name }}</p>
+          <button
+            @click="closeModal()"
+            class="delete"
+            aria-label="close"
+          ></button>
         </header>
         <section class="modal-card-body">
-          <p>Genero: {{currentCharacter.gender}}</p>
-          <p>Estado: {{currentCharacter.status}}</p>
-          <p>Raza: {{currentCharacter.species}}</p>
-          <p v-if="!currentCharacter.type == ''">Tipo: {{currentCharacter.type}}</p>
+          <p>Genero: {{ currentCharacter.gender }}</p>
+          <p>Estado: {{ currentCharacter.status }}</p>
+          <p>Raza: {{ currentCharacter.species }}</p>
+          <p v-if="!currentCharacter.type == ''">
+            Tipo: {{ currentCharacter.type }}
+          </p>
         </section>
         <footer class="modal-card-foot">
-          <button @click="modal  = false" class="button is-danger if-left">Cerrar</button>
+          <button @click="closeModal()" class="button is-danger if-left">
+            Cerrar
+          </button>
         </footer>
       </div>
     </div>
@@ -77,65 +101,53 @@
 </template>
 
 <script>
-import axios from "axios";
 import Characters from "./components/Characters";
+import { mapActions, mapMutations } from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: "App",
   data: function() {
     return {
-      characters: [],
       page: 1,
-      pages: 1,
-      search: "",
-      currentCharacter: [],
-      modal: false
+      search: ""
     };
   },
   created() {
-    this.fetch();
+    this.fetchApi({
+      page: this.page,
+      name: this.search
+    });
+  },
+  computed: {
+    ...mapState({
+      characters: "characters",
+      pages: "pages",
+      currentCharacter: "currentCharacter",
+      modal: "modal"
+    })
   },
   components: {
     Characters
   },
   methods: {
-    fetch() {
-      const params = {
-        page: this.page,
-        name: this.search
-      };
+    ...mapActions(["fetchApi", "fetchId"]),
+    ...mapMutations({ closeModal: "closeModal" }),
 
-      axios
-        .get("https://rickandmortyapi.com/api/character/", { params })
-        .then(res => {
-          this.pages = res.data.info.pages;
-          this.characters = res.data.results;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
     changePage(page) {
       this.page = page <= 0 || page > this.pages ? this.pages : page;
-      this.fetch();
+      this.fetchApi({
+        page: page
+      });
     },
     searchData() {
-      this.fetch();
+      this.fetchApi({
+        page: this.page,
+        name: this.search
+      });
     },
     showModal(id) {
       this.fetchId(id);
-    },
-    async fetchId(id) {
-      axios
-        .get(`https://rickandmortyapi.com/api/character/${id}`)
-        .then(res => {
-          console.log(res.data);
-          this.currentCharacter = res.data;
-          this.modal = true;
-        })
-        .catch(err => {
-          console.log(err);
-        });
     }
   }
 };
@@ -153,7 +165,8 @@ export default {
   padding: 4rem 0 !important;
 }
 
-.container, .modal-card {
+.container,
+.modal-card {
   padding: 15px;
 }
 </style>
